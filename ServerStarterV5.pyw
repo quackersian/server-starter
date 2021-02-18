@@ -2,11 +2,6 @@
 ##
 ## v5 updated 16/02/2021
 
-##TODO
-##
-## [ ] Add way to close bot
-## [X] Add way to see running servers
-
 
 import discord
 import subprocess
@@ -24,8 +19,6 @@ from DiscordToken import MyBotToken
 
 client = discord.Client()
 version = "v5 16/02/2021"
-longBS = 195617048569708545 #int
-longJS = 178958435612622848
 updateSquad = [r"C:\steamcmd\squad_installandupdateBot.bat"]
 startSquad = [r"C:\servers\squad_server\StartSquadServer.bat"]
 startFactorio = [r"C:\servers\factorio_server\factorio_headless_x64_1.1.19\factorio\StartFactorioServer.bat"]
@@ -45,8 +38,6 @@ cmdAdminRemove = "!adminremove"
 cmdServers = "!servers"
 cmdBotStop = "!botstop"
 
-#BigSpender and JamSandwich
-#admins = [195617048569708545, 178958435612622848]
 
 #Get admins from file.
 with open (fileAdmins, 'r') as file:
@@ -400,101 +391,6 @@ async def on_message(message):
             log.close()
             await message.author.send("No servers running.")
             
-            
-
-##    if message.content.startswith(cmdBotStop):
-##        
-##        #only admins can stop the bot
-##        if message.author.id in admins:
-##            
-##            log.write(now)
-##            log.write("{0.author} stopped the bot. \n".format(message))
-##            log.close()
-##
-##            await message.author.send("Goodbye.")
-##            
-##            sys.exit()
-##            
-##
-##        else:
-##            log.write(now)
-##            log.write("{0.user} tried to stop the bot, but they were not authorised \n".format(message))
-##            log.close()
-##            await message.author.send("You are not authorised to stop the bot.")
-##
-##
-##        
-
-##    if message.content.startswith(cmdAdminAdd):
-##
-##        #only admins can add another admin
-##        if message.author.id in admins:
-##            try:
-##                #(message.content)
-##                #get new admin ID from message. needs to be format !adminadd xxxxx
-##                newAdmin = message.content.split()[1]
-##                #print(newAdmin)               
-##
-##                with open('admins.txt', 'a') as file:
-##                    file.write("\n" + newAdmin)
-##                    file.close()
-##
-##                log.write(now)
-##                log.write("{0.author} added a new admin {1}. \n".format(message, newAdmin))
-##                
-##            except Exception as e:
-##                print (e)
-##                return
-##            
-##        else:
-##            #print("{0.author} is not an admin.".format(message))
-##            log.write(now)
-##            log.write("{0.author} tried to add an admin, but they are not an admind themselves. \n".format(message))
-
-
-            
-##    if message.content.startswith(cmdAdminRemove):
-##
-##        #only admins can add another admin
-##        if message.author.id in admins:
-##           
-##            try:
-##                #print(message.content)
-##                #get removed admin ID from message. needs to be format !adminremove xxxxx.
-##                #need to convert to int as admins is a list of ints. message.author.id is an int.
-##                
-##                remAdmin = message.content.split()[1]
-##                remAdmin = int(remAdmin, 10)
-##                print("Removed Admin")
-##                print(remAdmin)
-##                
-##
-##                
-##                #can only remove an admin if they are already an admin!
-##                if remAdmin in admins:
-##                    
-##                    #remove it
-##                    
-##                    newAdmins = admins
-##                    print(newAdmins)
-##                    newAdmins = newAdmins.remove(remAdmin)
-##                    
-##                    print("New Admins")
-##                    print(newAdmins)
-##
-##                    
-##                else:
-##                    print("remAdmin is not an admin")
-##                
-##                
-##                
-##                
-##            except Exception as e:
-##                print (e)
-##                return
-##        else:
-##            print("Not an admin")
-     
 
 
 while True:
