@@ -90,6 +90,7 @@ async def on_ready():
     log("Logged on as {0.user} {1}.".format(client, version))
     #Get admins from file.
     with open (fileAdmins, 'r') as file:
+        global admins
         admins = file.read()
         file.close()
         
