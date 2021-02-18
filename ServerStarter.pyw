@@ -20,7 +20,7 @@ import pyautogui as pag
 import pygetwindow as pgw
 from datetime import datetime
 
-from DiscordToken import MyBotToken
+from credentials import token
 
 client = discord.Client()
 version = "v6 18/02/2021"
@@ -349,7 +349,7 @@ def main():
     
     while True:
         try:
-            client.loop.run_until_complete(client.run(MyBotToken))
+            client.loop.run_until_complete(client.run(token))
 
         except BaseException:
 
