@@ -41,18 +41,7 @@ cmdCommand = "!"
 cmdServers = "!servers"
 retryCount = 1
 
-#Get admins from file.
-with open (fileAdmins, 'r') as file:
-    admins = file.read()
 
-    file.close()
-
-    #takes admins from file and converts to ints, as message.author.id is an int.
-    admins = admins.split()
-    admins = list(map(int, admins))
-    
-    log("Loaded admins from file.")
-    
 
 
 
@@ -99,6 +88,17 @@ adminMsg = """```
 async def on_ready():
     
     log("Logged on as {0.user} {1}.".format(client, version))
+    #Get admins from file.
+    with open (fileAdmins, 'r') as file:
+        admins = file.read()
+        file.close()
+        
+        #takes admins from file and converts to ints, as message.author.id is an int.
+        admins = admins.split()
+        admins = list(map(int, admins))
+    
+        log("Loaded admins from file.")
+    
 
 @client.event
 async def on_message(message):
@@ -367,4 +367,6 @@ def main():
         
             
 
+if __name__ == "__main__":
+    main()
     
