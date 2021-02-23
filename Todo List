@@ -1,2 +1,2 @@
 [ ] Restart/shut down servers when not in use
-[ ] Redo the server counting to include all possible servers
+[X] Redo the server counting to include all possible servers - v7 note: could be changed to be more adaptive.
