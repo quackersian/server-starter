@@ -1,2 +1,2 @@
 [ ] Restart/shut down servers when not in use
-[ ] shut down servers at 3AM (or similar) to reduce usage
+[ ] Redo the server counting to include all possible servers
