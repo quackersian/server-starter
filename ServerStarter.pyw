@@ -4,7 +4,7 @@ Server Starter bot.
 A custom bot for managing servers on a private home server.
 
 Created by Big Spender#7291
-v6 updated 18/02/2021
+v7 updated 23/02/2021
 
 """
 
@@ -286,18 +286,19 @@ async def on_message(message):
 
     if message.content.startswith(cmdServers):
         
-        log("{0.author} checked the servers. \n".format(message))
-
+        log("{0.author} checked the servers.".format(message))
+                
         #checks running servers by looking for window titles. same as other checks.
 
         #checking factorio
         try:
             fctSrv = pgw.getWindowsWithTitle(nameFactorio)[0]
-            fctSrv = True
-            
+            #fctSrv = True
+            fctResponse = "Factorio: Running \n"
             
         except IndexError:
             fctSrv = False
+            fctResponse = "Factorio: Not running \n"
 
         except Exception as e:
                 log(e)
@@ -307,35 +308,42 @@ async def on_message(message):
         try:            
             sqdSrv = pgw.getWindowsWithTitle(nameSquad)[0]
             sqdSrv = True
+            sqdResponse = "Squad: Running \n"
             
             
         except IndexError:
             sqdSrv = False
+            sqdResponse = "Squad: Not running \n"
 
         except Exception as e:
                 log.write(e)
                 return
             
+
+        response = "Servers running:```" + fctResponse + sqdResponse +"```"
+        log(response)
+        await message.author.send(response)
         
-        #replying with server status
-        if (fctSrv == True) and (sqdSrv == True):
-            log("Both the Factorio and Squad server is running.")
-            await message.author.send("Both the Factorio and Squad server is running.")
-            
+##        #replying with server status
+##        if (fctSrv == True) and (sqdSrv == True):
+##            log("Both the Factorio and Squad server is running.")
+##            await message.author.send("Both the Factorio and Squad server is running.")
+##            
+##
+##        elif fctSrv == True:
+##            log("The Factorio server is running.")
+##            await message.author.send("The Factorio server is running.")
+##            
+##
+##        elif sqdSrv == True:
+##            log("The Squad server is running.")
+##            await message.author.send("The Squad server is running.")
+##            
+##        else:
+##            log("No servers running.")
+##            await message.author.send("No servers running.")
 
-        elif fctSrv == True:
-            log("The Factorio server is running.")
-            await message.author.send("The Factorio server is running.")
-            
-
-        elif sqdSrv == True:
-            log("The Squad server is running.")
-            await message.author.send("The Squad server is running.")
-            
-        else:
-            log.write("No servers running.")
-            await message.author.send("No servers running.")
-    
+#Logging function. Writes date, time and given text to file.
 def log(text):
     
     now = datetime.now()
@@ -358,9 +366,9 @@ def main():
             
             while retryCount<6:
             
-                log("Lost connection to Discord, retrying. Attempt {0}.".format(count))           
+                log("Lost connection to Discord, retrying. Attempt {0}.".format(retryCount))           
                 time.sleep(30)
-                count += 1        
+                retryCount += 1        
             
         
             log("Tried 5 times to reconnect, giving up.")
