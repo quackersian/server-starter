@@ -1,11 +1,8 @@
 """ 
 Server Starter bot.
-
 A custom bot for managing servers on a private home server.
-
 Created by Big Spender#7291
 v7 updated 23/02/2021
-
 """
 
 import discord
@@ -42,19 +39,13 @@ cmdServers = "!servers"
 retryCount = 1
 
 
-
-
-
 pubMsg = """```
 !help
     Shows this message
-
 !servers
     Shows the running servers
-
 !squadstart
     Starts the Squad server
-
 !factoriostart
     Starts the Factorio server
 ``` """
@@ -63,22 +54,17 @@ pubMsg = """```
 adminMsg = """```
 !help
     Shows this message
-
 !servers
     Shows the running servers
         
 !squadupdate
     Updates the Squad server
-
 !squadstart
     Starts the Squad server
-
 !squadstop
     Closes the Squad server
-
 !factoriostart
     Starts the Factorio server
-
 !factoriostop
     Closes the Factorio server
     ``` """
@@ -320,28 +306,11 @@ async def on_message(message):
                 return
             
 
-        response = "Servers running:```" + fctResponse + sqdResponse +"```"
+        response = fctResponse + sqdResponse
         log(response)
         await message.author.send(response)
         
-##        #replying with server status
-##        if (fctSrv == True) and (sqdSrv == True):
-##            log("Both the Factorio and Squad server is running.")
-##            await message.author.send("Both the Factorio and Squad server is running.")
-##            
-##
-##        elif fctSrv == True:
-##            log("The Factorio server is running.")
-##            await message.author.send("The Factorio server is running.")
-##            
-##
-##        elif sqdSrv == True:
-##            log("The Squad server is running.")
-##            await message.author.send("The Squad server is running.")
-##            
-##        else:
-##            log("No servers running.")
-##            await message.author.send("No servers running.")
+
 
 #Logging function. Writes date, time and given text to file.
 def log(text):
@@ -353,6 +322,8 @@ def log(text):
         log.write(text)
         log.write("\n")
         log.close()
+
+
 
 def main():
     
@@ -378,4 +349,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
