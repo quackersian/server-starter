@@ -38,7 +38,6 @@ cmdCommand = "!"
 cmdServers = "!servers"
 retryCount = 1
 
-
 pubMsg = """```
 !help
     Shows this message
@@ -47,27 +46,24 @@ pubMsg = """```
 !squadstart
     Starts the Squad server
 !factoriostart
-    Starts the Factorio server
-``` """
-
+    Starts the Factorio server``` """
 
 adminMsg = """```
 !help
     Shows this message
 !servers
-    Shows the running servers
-        
+    Shows the running servers        
 !squadupdate
     Updates the Squad server
 !squadstart
     Starts the Squad server
 !squadstop
-    Closes the Squad server
+    Stops the Squad server
 !factoriostart
     Starts the Factorio server
 !factoriostop
-    Closes the Factorio server
-    ``` """
+    Stops the Factorio server``` """
+
 
 
 @client.event
@@ -280,11 +276,11 @@ async def on_message(message):
         try:
             fctSrv = pgw.getWindowsWithTitle(nameFactorio)[0]
             #fctSrv = True
-            fctResponse = "Factorio: Running \n"
+            fctResponse = "Factorio: Running"
             
         except IndexError:
             fctSrv = False
-            fctResponse = "Factorio: Not running \n"
+            fctResponse = "Factorio: Not running"
 
         except Exception as e:
                 log(e)
@@ -294,21 +290,22 @@ async def on_message(message):
         try:            
             sqdSrv = pgw.getWindowsWithTitle(nameSquad)[0]
             sqdSrv = True
-            sqdResponse = "Squad: Running \n"
+            sqdResponse = "Squad: Running"
             
             
         except IndexError:
             sqdSrv = False
-            sqdResponse = "Squad: Not running \n"
+            sqdResponse = "Squad: Not running"
 
         except Exception as e:
                 log.write(e)
                 return
             
 
-        response = fctResponse + sqdResponse
-        log(response)
-        await message.author.send(response)
+        msgResponse = fctResponse + "\n" + sqdResponse
+        logResponse = fctResponse + ". " + sqdResponse
+        log(logResponse)
+        await message.author.send(msgResponse)
         
 
 
