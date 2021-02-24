@@ -168,7 +168,7 @@ async def on_message(message):
         
         #User is not an admin, so can't update the server 
         else:
-            log("{0.author} tried to update the Squad server.".format(message))
+            log("{0.author} tried to update the Squad server, but they were not authorised.".format(message))
             await message.author.send("You cannot update the Squad server. Please ask an admin.")
 
             
@@ -298,7 +298,7 @@ async def on_message(message):
             sqdResponse = "Squad: Not running"
 
         except Exception as e:
-                log.write(e)
+                log(e)
                 return
             
 
@@ -315,9 +315,9 @@ def log(text):
     now = datetime.now()
     now = now.strftime("%Y-%m-%d %H:%M:%S ")
     with open(fileLog, "a") as log:
-        log.write(now)
-        log.write(text)
         log.write("\n")
+        log.write(now)
+        log.write(text)        
         log.close()
 
 
