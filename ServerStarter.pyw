@@ -20,7 +20,7 @@ from datetime import datetime
 from credentials import token
 
 client = discord.Client()
-version = "v7 23/02/2021"
+version = "v8 25/02/2021"
 updateSquad = [r"C:\steamcmd\squad_installandupdateBot.bat"]
 startSquad = [r"C:\servers\squad_server\StartSquadServer.bat"]
 startFactorio = [r"C:\servers\factorio_server\factorio_headless_x64_1.1.19\factorio\StartFactorioServer.bat"]
