@@ -37,6 +37,7 @@ cmdFactorioStart = "!factoriostart"
 cmdFactorioStop = "!factoriostop"
 cmdHelp = "!help"
 cmdServers = "!servers"
+cmdCommand = "!"
 
 retryCount = 1
 squadProcess = ""
