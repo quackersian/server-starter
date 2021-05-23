@@ -2,11 +2,11 @@
 Server Starter bot.
 A custom bot for managing servers on a private home server.
 Created by Big Spender#7291
-v7 updated 23/02/2021
+v8 updated 23/05/2021
 """
 
 import discord
-import subprocess
+from subprocess import Popen
 import signal
 import os
 import asyncio
@@ -20,45 +20,52 @@ from datetime import datetime
 from credentials import token
 
 client = discord.Client()
-version = "v7 23/02/2021"
+version = "v8 23/05/2021"
 updateSquad = [r"C:\steamcmd\squad_installandupdateBot.bat"]
 startSquad = [r"C:\servers\squad_server\StartSquadServer.bat"]
 startFactorio = [r"C:\servers\factorio_server\factorio_headless_x64_1.1.19\factorio\StartFactorioServer.bat"]
 nameFactorio = "StartFactorioServer"
 nameSquad = "C:\\servers\\squad_server\\SquadGame\\Binaries\\Win64\\SquadGameServer.exe"
+nameSquadUpdate = "UpdateSquad"
 fileLog = "log.txt"
 fileAdmins = "admins.txt"
 cmdSquadStart = "!squadstart"
 cmdSquadUpdate = "!squadupdate"
-cmdSquadQuit = "!squadstop"
+cmdSquadStop = "!squadstop"
+cmdSquadAdmin = "!squadadmin"
 cmdFactorioStart = "!factoriostart"
-cmdFactorioQuit = "!factoriostop"
+cmdFactorioStop = "!factoriostop"
 cmdHelp = "!help"
-cmdCommand = "!"
 cmdServers = "!servers"
+
 retryCount = 1
+squadProcess = ""
 
 pubMsg = """```
 !help
     Shows this message
 !servers
     Shows the running servers
+    
 !squadstart
     Starts the Squad server
+    
 !factoriostart
     Starts the Factorio server``` """
 
 adminMsg = """```
 !help
-    Shows this message
+    Shows this message    
 !servers
-    Shows the running servers        
-!squadupdate
-    Updates the Squad server
+    Shows the running servers
+    
 !squadstart
     Starts the Squad server
 !squadstop
     Stops the Squad server
+!squadupdate
+    Updates the Squad server
+    
 !factoriostart
     Starts the Factorio server
 !factoriostop
@@ -92,20 +99,9 @@ async def on_message(message):
         return
 
     guild = message.guild
+    allWindows = pgw.getAllTitles()
 
-    #Reply with DM if not a DM. Only responds to commands.
-    if guild:
-        if message.content.startswith(cmdCommand):
-            log("Public message from {0.author}. {0.content}.".format(message))
-
-            #Admins gets unique options.
-            if message.author.id in admins:
-                await message.author.send(adminMsg)
-                
-            else:
-                await message.author.send(pubMsg)
-                
-
+###############################################################################################################################
     
     #skip reading message if its from the bot.
     if message.author == client.user:        
@@ -123,183 +119,204 @@ async def on_message(message):
             
         else:
             await message.author.send(pubMsg)
-            
-        
 
+            
+            
+###############################################################################################################################
+            
+    #starting squad server
     if message.content.startswith(cmdSquadStart):
         
         try:
             #don't start the server if it is already running
-            sqdSrv = pgw.getWindowsWithTitle(nameSquad)[0]            
-            log("{0.author} tried to start the Squad server, but it was already running.".format(message))
-            await message.author.send("The Squad server is already running.")
+            if nameSquad in allWindows:
+                log("{0.author} tried to start the Squad server, but it was already running.".format(message))
+                await message.author.send("The Squad server is already running.")
+                return
 
-        except IndexError:      
-            #if the server window doesn't exist, then it is not running so we can start it.
-            log("{0.author} started the Squad server.".format(message))            
-            await message.author.send("Starting the Squad server.")    
-            subprocess.Popen(startSquad)
+            #don't start the server if it is updating   
+            if nameSquadUpdate in allWindows:
+                log("{0.author} tried to start the Squad server, but it was updating.".format(message))
+                await message.author.send("The Squad server is currently updating, please try again later.")
+                return
+
+            #start the server if it is not already running and it is not updating.
+            else:
+                log("{0.author} started the Squad server.".format(message))
+                await message.author.send("Starting the Squad server.")    
+                squadProcess = Popen(startSquad)
+
             
         except Exception as e:
-            log(e)
+            log("ERROR: " + str(e))
             return
 
+
+    #updating squad server
     if message.content.startswith(cmdSquadUpdate):
         
         #check if the author is an admin
         if message.author.id in admins:          
             
             try:
-                #if the window does exist, then the server is still running so can't update it.
-                sqdSrv = pgw.getWindowsWithTitle(nameSquad)[0]
-                log("{0.author} tried to update the Squad server, but it was already running.".format(message))
-                await message.author.send("The Squad server is currently running. Please close it first.")
-                return
-                
-            except IndexError:
-                #if the window doesn't exist then it is not running, so we can update it.
-                log("{0.author} updated the Squad server.".format(message))
-                await message.author.send("Updating the Squad server. This may take a while depending on the size of the update.")    
-                subprocess.Popen(updateSquad)
+                #don't update the server if it is running.
+                if nameSquad in allWindows:
+                    log("{0.author} tried to update the Squad server, but it was already running.".format(message))
+                    await message.author.send("The Squad server is currently running. Please close it first.")
+                    return
+
+                #don't update the server if it is already updating
+                if nameSquadUpdate in allWindows:
+                    log("{0.author} tried to update the Squad server, but it was already updating.".format(message))
+                    await message.author.send("The Squad server is already updating.")
+                    return
+
+                #the server is not running and not updating, so it can be updated.
+                else:
+                    log("{0.author} updated the Squad server.".format(message))
+                    await message.author.send("Updating the Squad server. This may take a while depending on the size of the update.")    
+                    subprocess.Popen(updateSquad)
                 
             except Exception as e:
-                log(e)
+                log("ERROR: " + str(e))
                 return
         
         #User is not an admin, so can't update the server 
         else:
             log("{0.author} tried to update the Squad server, but they were not authorised.".format(message))
             await message.author.send("You cannot update the Squad server. Please ask an admin.")
+            return
 
-            
-    if message.content.startswith(cmdSquadQuit):
+
+    #stopping squad server            
+    if message.content.startswith(cmdSquadStop):
             
        #Only admins can close the server.        
         if message.author.id in admins:
             
             try:
                 #If the window exists, then the server is running.
-                sqdSrv = pgw.getWindowsWithTitle(nameSquad)[0]                
-                log("{0.author} closed Squad server.".format(message))
-                await message.author.send("Closing the Squad server.")
-                
-                sqdSrv = pgw.getWindowsWithTitle(nameSquad)[0]
-                sqdSrv.restore()
-                sqdSrv.activate()
-                time.sleep(5)
-                pag.hotkey('ctrl', 'c')
-                
-                
-            except IndexError:
-                #if the window doesn't exist, then the server is not running
-                log("{0.author} tried to close the Squad server, but it was not running.".format(message))
-                await message.author.send("The Squad server is not running.")
+                if nameSquad in allWindows:                
+                    log("{0.author} closed Squad server.".format(message))
+                    await message.author.send("Closing the Squad server.")
+                    Popen("TASKKILL /F /PIS {pid} /T".format(pid=squadProcess.pid))               
+
+                else:
+                    #if the window doesn't exist, then the server is not running
+                    log("{0.author} tried to close the Squad server, but it was not running.".format(message))
+                    await message.author.send("The Squad server is not running.")
+                    return
 
             except Exception as e:
-                log(e)
+                log("ERROR: " + str(e))
                 return
             
         else:
             #The user is not authorised to close the server.
             log("{0.author} tried to close the Squad server, but they were not authorised.".format(message))
             await message.author.send("You cannot shut down the server. Please ask an admin.")
-            
+            return
 
 
+###############################################################################################################################
+
+    #starting Factorio
     if message.content.startswith(cmdFactorioStart):
         
         #Check if its running first.
         try:
+
             #If the window exists, then it is already running.
-            fctSrv = pgw.getWindowsWithTitle(nameFactorio)[0]
-            log("{0.author} tried to start the Factorio server, but it was already running.".format(message))
-            await message.author.send("The Factorio server is already running.")
-            
-        
-        except IndexError:
+            if nameFactorio in allWindows:                
+                log("{0.author} tried to start the Factorio server, but it was already running.".format(message))
+                await message.author.send("The Factorio server is already running.")
+                return
+
             #if the window doesn't exist, then the server is not running.
-            log("{0.author} started the Factorio server.".format(message))
-            await message.author.send("Starting Factorio server.")    
-            subprocess.Popen(startFactorio)
+            else:                
+                log("{0.author} started the Factorio server.".format(message))
+                await message.author.send("Starting Factorio server.")
+                factorioProcess = Popen(startFactorio)
 
         except Exception as e:
-            log(e)
+            log("ERROR: " + str(e))
             return
             
 
 
-
-    if message.content.startswith(cmdFactorioQuit):
+    #stopping Factorio
+    if message.content.startswith(cmdFactorioStop):
         
         #Only admins can close the server
         if message.author.id in admins:
 
             try:
+                
                 #if the window exists, then it is running so we can close it.
-                fctSrv = pgw.getWindowsWithTitle(nameFactorio)[0]
-                log("{0.author} closed the Factorio server.".format(message))
-                await message.author.send("Closing the Factorio server.")
-                
-                fctSrv.restore()
-                fctSrv.activate()
-                time.sleep(5)
-                pag.hotkey('ctrl', 'c')
-                time.sleep(15)
-                pag.write('y')
-                pag.press('enter')
-                
-                
-            except IndexError:
+                if nameFactorio in allWindows:                    
+                    log("{0.author} closed the Factorio server.".format(message))
+                    await message.author.send("Closing the Factorio server.")
+                    Popen("TASKKILL /F /PIS {pid} /T".format(pid=factorioProcess.pid)) 
+
                 #If the window doesn't exist, then the server is not running.
-                log("{0.author} tried to close the Factorio server, but it was not running.".format(message))
-                await message.author.send("The Factorio server is not running.")
+                else:
+                    log("{0.author} tried to close the Factorio server, but it was not running.".format(message))
+                    await message.author.send("The Factorio server is not running.")
+                    return
 
             except Exception as e:
-                log(e)
-                return
-                
+                log("ERROR: " + str(e))
+                return                
 
         else:
             #User not authorised to close the factorio server
             log("{0.author} tried to close the Factorio server, but they were not authorised.".format(message))
             await message.author.send("You cannot shut down the server. Please ask an admin.")
+            return
             
 
+###############################################################################################################################
 
+
+    #checking running servers
     if message.content.startswith(cmdServers):
         
         log("{0.author} checked the servers.".format(message))
                 
         #checks running servers by looking for window titles. same as other checks.
 
-        #checking factorio
         try:
-            fctSrv = pgw.getWindowsWithTitle(nameFactorio)[0]
-            #fctSrv = True
-            fctResponse = "Factorio: Running"
-            
-        except IndexError:
-            fctSrv = False
-            fctResponse = "Factorio: Not running"
+
+            #squad running
+            if nameSquad in allWindows:
+                sqdResponse = "Squad: Running"
+
+            #squad updating
+            elif nameSquadUpdate in allWindows:
+                sqdResponse = "Squad: Updating"
+
+            #squad not running
+            else:
+                sqdResponse = "Squad: Not Running"
+
+
+
+            #factorio running
+            if nameFactorio in allWindows:
+                fctResponse = "Factorio: Running"
+
+            #factorio updating
+            elif nameSquadUpdate in allWindows:
+                fctResponse = "Factorio: Updating"
+
+            #factorio not running
+            else:
+                fctResponse = "Factorio: Not Running"
+
 
         except Exception as e:
-                log(e)
-                return
-            
-        #checking squad
-        try:            
-            sqdSrv = pgw.getWindowsWithTitle(nameSquad)[0]
-            sqdSrv = True
-            sqdResponse = "Squad: Running"
-            
-            
-        except IndexError:
-            sqdSrv = False
-            sqdResponse = "Squad: Not running"
-
-        except Exception as e:
-                log(e)
-                return
+            log("ERROR: " + str(e))
+            return
             
 
         msgResponse = fctResponse + "\n" + sqdResponse
@@ -307,7 +324,7 @@ async def on_message(message):
         log(logResponse)
         await message.author.send(msgResponse)
         
-
+###############################################################################################################################
 
 #Logging function. Writes date, time and given text to file.
 def log(text):
@@ -320,7 +337,7 @@ def log(text):
         log.write(text)        
         log.close()
 
-
+###############################################################################################################################
 
 def main():
     
