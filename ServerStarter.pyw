@@ -7,12 +7,8 @@ v8 updated 23/05/2021
 
 import discord
 from subprocess import Popen
-import signal
-import os
-import asyncio
 import time
 import sys
-import array
 import pyautogui as pag
 import pygetwindow as pgw
 from datetime import datetime

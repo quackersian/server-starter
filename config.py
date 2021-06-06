@@ -1,0 +1,17 @@
+updateSquad = [r"C:\steamcmd\squad_installandupdateBot.bat"]
+startSquad = [r"C:\servers\squad_server\StartSquadServer.bat"]
+startFactorio = [r"C:\servers\factorio_server\factorio_headless_x64_1.1.19\factorio\StartFactorioServer.bat"]
+nameFactorio = "StartFactorioServer"
+nameSquad = "C:\\servers\\squad_server\\SquadGame\\Binaries\\Win64\\SquadGameServer.exe"
+nameSquadUpdate = "UpdateSquad"
+fileLog = "log.txt"
+#fileAdmins = "admins.txt"
+# cmdSquadStart = "!squadstart"
+# cmdSquadUpdate = "!squadupdate"
+# cmdSquadStop = "!squadstop"
+# cmdSquadAdmin = "!squadadmin"
+# cmdFactorioStart = "!factoriostart"
+# cmdFactorioStop = "!factoriostop"
+# cmdHelp = "!help"
+# cmdServers = "!servers"  
+cmdPrefix = "!"

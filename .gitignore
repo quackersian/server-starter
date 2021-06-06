@@ -1,0 +1,8 @@
+
+.vscode/launch.json
+.vscode/settings.json
+__pycache__/credentials.cpython-39.pyc
+__pycache__/config.cpython-39.pyc
+__pycache__/log.cpython-39.pyc
+credentials.py
+log.py
