@@ -9,13 +9,7 @@ from os import name, read
 import discord
 from discord.ext import commands
 from subprocess import Popen
-import time
-import sys
 from discord.ext.commands.core import command
-import pyautogui as pag
-import pygetwindow as pgw
-from datetime import datetime
-
 import pyautogui as pag
 import pygetwindow as pgw
 from datetime import datetime
@@ -36,8 +30,7 @@ async def on_ready():
 @bot.event
 async def afterReady(ready=False):
     
-    if ready == True:
-        
+    if ready == True:       
 
         log("--------------")
         log("Logged in as: {}".format(bot.user))
@@ -53,25 +46,15 @@ async def afterReady(ready=False):
         
         log("Status changed to \"Playing {}help\"".format(config.cmdPrefix))
     
+    else:
+        print("Not ready yet")
+
 
 
 class squad(commands.Cog, name="Squad Game Commands"):
     def __init__(self, bot):
         self.bot = bot
-
-    def log(text):
-        try:            
-            now = datetime.now()
-            now = now.strftime("%Y-%m-%d %H:%M:%S ")
-            with open(config.fileLog, "a") as file:
-                file.write("\n")
-                file.write(now)
-                file.write(text)        
-                file.close()            
-            
-        except Exception as e:
-            print("ERROR: " + str(e))
-            return     
+    
     
 
     @commands.command(name="squadstart", brief="Starts Squad server")
@@ -145,20 +128,7 @@ class factorio(commands.Cog, name="Factorio Game Commands"):
     def __init__(self, bot):
         self.bot = bot
 
-    def log(text):
-        try:            
-            now = datetime.now()
-            now = now.strftime("%Y-%m-%d %H:%M:%S ")
-            with open(config.fileLog, "a") as file:
-                file.write("\n")
-                file.write(now)
-                file.write(text)        
-                file.close()            
-            
-        except Exception as e:
-            print("ERROR: " + str(e))
-            return 
-              
+             
 
     @commands.command(name="factoriostart", brief = "Starts Factorio server")
     async def factorioStart(self, ctx):
@@ -203,56 +173,56 @@ class factorio(commands.Cog, name="Factorio Game Commands"):
 class servers(commands.Cog, name="Server Info"):
     def __init__(self, bot):
         self.bot = bot
-    
+   
+
+
     @commands.command(name="servers", brief = "Shows server info")
     async def server(self, ctx):
         allWindows = pgw.getAllTitles()
+        response=""
 
         #squad running
         if config.nameSquad in allWindows:
-            sqdResponse = "Squad: Running"
+            response.append("Squad: Running\n")
 
         #squad updating
         elif config.nameSquadUpdate in allWindows:
-            sqdResponse = "Squad: Updating"
+            response.append("Squad: Updating\n")
 
         #squad not running
         else:
-            sqdResponse = "Squad: Not Running"
+            response.append("Squad: Not Running\n")
         
 
         #factorio running
         if config.nameFactorio in allWindows:
-            fctResponse = "Factorio: Running"
+            response.append("Factorio: Running\n")
 
         #factorio not running
         else:
-            fctResponse = "Factorio: Not Running"
+            response.append("Factorio: Not Running\n")
     
 
-        msgResponse = fctResponse + "\n" + sqdResponse
-        logResponse = fctResponse + ". " + sqdResponse
         log("{0.author} checked server status".format(ctx))
-        log(logResponse)
-        await ctx.send(msgResponse)
-
+        log(response)
+        await ctx.send(response)
 
 
 def log(text):
-    try:
+        try:
+            
+            now = datetime.now()
+            now = now.strftime("%Y-%m-%d %H:%M:%S ")
+            with open(config.fileLog, "a") as file:
+                file.write("\n")
+                file.write(now)
+                file.write(text)        
+                file.close()        
         
-        now = datetime.now()
-        now = now.strftime("%Y-%m-%d %H:%M:%S ")
-        with open(config.fileLog, "a") as file:
-            file.write("\n")
-            file.write(now)
-            file.write(text)        
-            file.close()
-        
-        
-    except Exception as e:
-        print("ERROR: " + str(e))
-        return
+        except Exception as e:
+            print("ERROR: " + str(e))
+            return
+
 
 
 bot.add_cog(servers(bot))

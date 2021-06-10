@@ -5,4 +5,5 @@ __pycache__/credentials.cpython-39.pyc
 __pycache__/config.cpython-39.pyc
 __pycache__/log.cpython-39.pyc
 credentials.py
+ServerStarter.pyw
 log.py
