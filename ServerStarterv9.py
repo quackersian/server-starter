@@ -2,7 +2,7 @@
 Server Starter bot.
 A custom bot for managing servers on a private home server.
 Created by Big Spender#7291
-v9 updated 06/06/2021
+v9 updated 10/06/2021
 """
 
 from os import name, read
@@ -13,7 +13,7 @@ from discord.ext.commands.core import command
 import pyautogui as pag
 import pygetwindow as pgw
 from datetime import datetime
-from credentials import token
+import credentials
 import config #import cmdPrefix, fileLog, nameSquad, nameSquadUpdate, startSquad
 
 
@@ -40,7 +40,8 @@ async def afterReady(ready=False):
         log("Connected to following servers:")
         for guild in bot.guilds:
             log("- " + guild.name + " " + str(guild.id))
-            
+
+        #sets bot's status to "Playing !help" where ! is prefix
         game = discord.Game("{}help".format(config.cmdPrefix))
         await bot.change_presence(status=discord.Status.online, activity=game)
         
@@ -230,4 +231,4 @@ bot.add_cog(squad(bot))
 bot.add_cog(factorio(bot))
 
 
-bot.run(token)
+bot.run(credentials.testToken)
