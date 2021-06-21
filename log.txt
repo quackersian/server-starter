@@ -1,0 +1,8 @@
+
+2021-06-06 14:19:26 --------------
+2021-06-06 14:19:26 Logged in as: BigSpenderTestBot#4575
+2021-06-06 14:19:26 Discord Version: 1.6.0
+2021-06-06 14:19:26 Prefix: !
+2021-06-06 14:19:26 Connected to following servers:
+2021-06-06 14:19:26 - Testys 587666101509554211
+2021-06-06 14:19:26 Status changed to "Playing !help"
