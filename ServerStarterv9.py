@@ -252,4 +252,4 @@ bot.add_cog(squad(bot))
 #bot.add_cog(factorio(bot))
 
 
-bot.run(credentials.testToken)
+bot.run(credentials.liveToken)
