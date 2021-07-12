@@ -1,9 +1,11 @@
+import credentials, config, discord
+import pyautogui as pag
+import pygetwindow as pgw
 from discord.ext import commands
 from subprocess import Popen
 from datetime import datetime, time
-import pyautogui as pag
-import pygetwindow as pgw
-import credentials, config, discord
+
+
 
 
 ready = False
@@ -34,12 +36,12 @@ async def afterReady(ready=False):
         for guild in bot.guilds:
             log(f"INFO - afterReady - {guild.name},  {guild.id}")
 
-        #sets bot's status to "Playing !help" where ! is prefix
+        
         game = discord.Game(F"{config.prefix}help")
         await bot.change_presence(status=discord.Status.online, activity=game)
         
         log(f"INFO - afterReady - Status changed to \"Playing {config.prefix}help\"")
-        print(f"{now} {config.botName} ready.")
+        print(f"{now} INFO - afterReady - {config.botName} ready.")
     
     else:
         log(f"{now} ERROR - afterReady - afterReady called before being ready")
@@ -129,15 +131,19 @@ class squad(commands.Cog, name="Squad Game Commands"):
         log(f"INFO - squad - {ctx.author} tried to add a new Squad admin, {adminToAdd}")
         
         await ctx.trigger_typing()
+        try:
+            textToAppend = f"Admin={adminToAdd}:WhiskeyLancer"
+            squadAdminFile = config.squadAdmins
+            with open(squadAdminFile, "a") as file:
+                file.write(textToAppend)
+                file.close()
 
-        textToAppend = f"Admin={adminToAdd}:WhiskeyLancer"
-        squadAdminFile = config.squadConfig
-        with open(squadAdminFile, "a") as file:
-            file.append(textToAppend)
-            file.close()
-
-        log(f"INFO - squad - Added Squad admin {adminToAdd}")
-        await ctx.send("Added Squad admin.")
+            log(f"INFO - squad - Added Squad admin {adminToAdd}")
+            await ctx.send("Added Squad admin.")
+        
+        except Exception as e:
+            log(f"ERROR - squad - Unable to add {adminToAdd} to admin file. {e}")
+            await ctx.send("Failed to add Squad admin.")
         
 
 
@@ -227,8 +233,7 @@ class servers(commands.Cog, name="Server Info"):
 
         #factorio not running
         else:
-            response = response + "Factorio: Not Running\n"
-    
+            response = response + "Factorio: Not Running\n"    
 
         
         log(F"INFO - servers - {response}")
@@ -247,7 +252,7 @@ def log(text):
                 file.close()        
         
         except Exception as e:
-            print(f"{now}ERROR with log function {e}")
+            print(f"{now}ERROR - log - Unable to add to log. {e}")
             return
 
 
