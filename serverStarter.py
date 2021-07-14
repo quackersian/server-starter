@@ -145,7 +145,7 @@ class squad(commands.Cog, name="Squad Game Commands"):
             appendText1 = f"""//{playerName}\n"""
             appendText2 = f"Admin={adminToAdd}:WhiskeyLancer\n"
 
-            squadAdminFile = config.SquadAdmins
+            squadAdminFile = config.squadAdmins
             with open(squadAdminFile, "a") as file:
                 file.write(appendText1)
                 file.write(appendText2)
@@ -154,7 +154,7 @@ class squad(commands.Cog, name="Squad Game Commands"):
 
 
             log(f"INFO - squad - Added Squad admin {adminToAdd}, {playerName}")
-            await ctx.send("Added Squad admin.")
+            await ctx.send(f"Added Squad admin {playerName}.")
         
         except Exception as e:
             log(f"ERROR - squad - Unable to add {adminToAdd} to admin file. {e}")
