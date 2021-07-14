@@ -3,4 +3,6 @@
 __pycache__
 credentials.py
 ServerStarter.pyw
-exampleSquadAdmins.txt
+exampleSquadAdmins.cfg
+admins.cfg
+configparsertest.py
