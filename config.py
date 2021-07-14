@@ -12,3 +12,5 @@ fileLog = "log.txt"
 scriptVersion="v11"
 botName = "Server Starter"
 prefix = "!"
+
+testSquadAdmins = "exampleSquadAdmins.cfg"

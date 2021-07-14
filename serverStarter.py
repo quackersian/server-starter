@@ -1,4 +1,5 @@
-import credentials, config, discord
+from discord import player
+import credentials, config, discord, urllib, requests, json
 import pyautogui as pag
 import pygetwindow as pgw
 from discord.ext import commands
@@ -7,10 +8,10 @@ from datetime import datetime, time
 
 
 
-
-ready = False
-
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(config.prefix))
+
+
+####################################################################################################
 
 @bot.event
 async def on_ready():
@@ -47,7 +48,7 @@ async def afterReady(ready=False):
         log(f"{now} ERROR - afterReady - afterReady called before being ready")
         return
 
-
+####################################################################################################
 
 class squad(commands.Cog, name="Squad Game Commands"):
     def __init__(self, bot):
@@ -132,13 +133,27 @@ class squad(commands.Cog, name="Squad Game Commands"):
         
         await ctx.trigger_typing()
         try:
-            textToAppend = f"Admin={adminToAdd}:WhiskeyLancer"
-            squadAdminFile = config.squadAdmins
-            with open(squadAdminFile, "a") as file:
-                file.write(textToAppend)
-                file.close()
+            
+            playerName = str(getSteamInfo(adminToAdd))
 
-            log(f"INFO - squad - Added Squad admin {adminToAdd}")
+            if playerName == "fail":
+                log(f"WARNING - squadAddAdmin - playerName failed")
+                await ctx.send("Unable to add Squad admin")
+                return
+
+
+            appendText1 = f"""//{playerName}\n"""
+            appendText2 = f"Admin={adminToAdd}:WhiskeyLancer\n"
+
+            squadAdminFile = config.SquadAdmins
+            with open(squadAdminFile, "a") as file:
+                file.write(appendText1)
+                file.write(appendText2)
+                file.close()          
+            
+
+
+            log(f"INFO - squad - Added Squad admin {adminToAdd}, {playerName}")
             await ctx.send("Added Squad admin.")
         
         except Exception as e:
@@ -148,7 +163,7 @@ class squad(commands.Cog, name="Squad Game Commands"):
 
 
 
-
+####################################################################################################
 
 class factorio(commands.Cog, name="Factorio Game Commands"):
     def __init__(self, bot):
@@ -198,6 +213,7 @@ class factorio(commands.Cog, name="Factorio Game Commands"):
             log(f"INFO - factorio - {ctx.author} tried to stop the Factorio server, but it was not running.")
             await ctx.send("Can't stop the Factorio server, it is not running.")  
 
+####################################################################################################
 
 class servers(commands.Cog, name="Server Info"):
     def __init__(self, bot):
@@ -239,6 +255,33 @@ class servers(commands.Cog, name="Server Info"):
         log(F"INFO - servers - {response}")
         await ctx.send(response)
 
+####################################################################################################
+
+def getSteamInfo(steam64ID=None):
+
+    if steam64ID is None:
+        log(f"WARNING - getSteamInfo - No Steam64ID provided")
+        return "fail"
+    
+
+    else:
+        steamUrl=f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={credentials.steamToken}&steamids={steam64ID}"
+        with urllib.request.urlopen(steamUrl) as url:
+            
+            data = json.loads(url.read().decode())
+            if data is not None:
+                
+                playerName = data['response']['players'][-1]['personaname']                
+                log(f"INFO - getSteamInfo - retrieved {playerName} from API")
+                return playerName
+
+
+            else:
+                log(f"ERROR - getSteamInfo - no data returned from Valve API")
+                return "fail"
+
+
+
 
 def log(text):
         try:
@@ -255,11 +298,11 @@ def log(text):
             print(f"{now}ERROR - log - Unable to add to log. {e}")
             return
 
-
+####################################################################################################
 
 bot.add_cog(servers(bot))
 bot.add_cog(squad(bot))
 #bot.add_cog(factorio(bot))
 
 
-bot.run(credentials.liveToken)
+bot.run(credentials.testToken)
