@@ -1,7 +1,7 @@
-squadAdmins = "C:\servers\squad_server\SquadGame\ServerConfig\Admins.cfg"
-nameSquad = "C:\\servers\\squad_server\\SquadGame\\Binaries\\Win64\\SquadGameServer.exe"
+squadAdmins = "D:\servers\squad_server\SquadGame\ServerConfig\Admins.cfg"
+nameSquad = "D:\\servers\\squad_server\\SquadGame\\Binaries\\Win64\\SquadGameServer.exe"
 
-startSquad = [r"C:\servers\squad_server\StartSquadServer.bat"]
+startSquad = [r"D:\servers\squad_server\StartSquadServer.bat"]
 updateSquad = [r"C:\steamcmd\squad_installandupdateBot.bat"]
 nameSquadUpdate = "UpdateSquad"
 
