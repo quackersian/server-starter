@@ -1,12 +1,10 @@
-from discord import player
-import credentials, config, discord, urllib, requests, json
+from discord.ext.commands.core import command
+import credentials, config, discord, urllib, json
 import pyautogui as pag
 import pygetwindow as pgw
 from discord.ext import commands
 from subprocess import Popen
 from datetime import datetime, time
-
-
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(config.prefix))
 
@@ -17,7 +15,10 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or(config.prefix))
 async def on_ready():
     await afterReady(True)
     
-
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, command.CommandNotFound):
+        return
 
 @bot.event
 async def afterReady(ready=False):
@@ -50,22 +51,19 @@ async def afterReady(ready=False):
 
 ####################################################################################################
 
-class squad(commands.Cog, name="Squad Game Commands"):
+class squad(commands.Cog, name="Squad"):
     def __init__(self, bot):
         self.bot = bot
+ 
     
-    
-
     @commands.command(name="sstart", brief="Starts Squad server")
     async def squadStart(self, ctx):
 
-        allWindows = pgw.getAllTitles()
-
-        if config.nameSquad in allWindows:
+        if self.squadStatus == "server":
             log(f"INFO - squad - {ctx.author} tried to start the Squad server, but it was already running.")
             await ctx.send("Can't start the server, it is already running.")
 
-        elif config.nameSquadUpdate in allWindows:
+        elif self.squadStatus == "update":
             log(f"INFO - squad - {ctx.author} tried to start the Squad server, but it was updating.")
             await ctx.send("Can't start the server, it is updating.")
         
@@ -74,23 +72,21 @@ class squad(commands.Cog, name="Squad Game Commands"):
             log(f"INFO - squad - {ctx.author} tried to start the Squad server.")
             Popen(config.startSquad)
             log(f"INFO - squad - Squad server started.")
-            
+   
 
 
     
     @commands.command(name="sstop",  brief="Stops Squad server")
     async def squadStop(self, ctx):
 
-        allWindows = pgw.getAllTitles()
-
-        if config.nameSquadUpdate in allWindows:
+        if self.squadStatus == "update":
             log(f"INFO - squad - {ctx.author} tried to stop the Squad server, but it was updating.")
             await ctx.send("Can't start the Squad server, it is updating.")
         
               
-        elif config.nameSquad in allWindows:
-            await ctx.send("Stopping the Squad server.")
+        elif self.squadStatus == "server":
             log(f"INFO - squad - {ctx.author} tried to stop the Squad server.")
+            await ctx.send("Stopping the Squad server.")
             sqdSrv = pgw.getWindowsWithTitle(config.nameSquad)[0]
             sqdSrv.restore()
             sqdSrv.activate()
@@ -109,13 +105,11 @@ class squad(commands.Cog, name="Squad Game Commands"):
     @commands.command(name="supdate", brief="Updates Squad server")
     async def squadUpdate(self, ctx):
         
-        allWindows = pgw.getAllTitles()
-
-        if config.nameSquad in allWindows:
+        if self.squadStatus == "server":
             log(f"INFO - squad - {ctx.author} tried to update the Squad server, but it was running.".format(ctx))
             await ctx.send("Can't update the Squad server, it is running.")
 
-        elif config.nameSquadUpdate in allWindows:
+        elif self.squadStatus == "update":
             log(f"INFO - squad - {ctx.author} tried to update the Squad server, but it was already updating.")
             await ctx.send("Can't update the Squad server, it is already updating.")
         
@@ -159,24 +153,30 @@ class squad(commands.Cog, name="Squad Game Commands"):
         except Exception as e:
             log(f"ERROR - squad - Unable to add {adminToAdd} to admin file. {e}")
             await ctx.send("Failed to add Squad admin.")
-        
+
+
+    def squadStatus(self, ctx):
+        allWindows = pgw.getAllTitles()
+        if config.nameSquad in allWindows:
+            return "server"
+        if config.nameSquadUpdate in allWindows:
+            return "update"
+        else:
+            return None    
 
 
 
 ####################################################################################################
 
-class factorio(commands.Cog, name="Factorio Game Commands"):
+class factorio(commands.Cog, name="Factorio"):
     def __init__(self, bot):
         self.bot = bot
 
-             
 
     @commands.command(name="fstart", brief = "Starts Factorio server")
     async def factorioStart(self, ctx):
 
-        allWindows = pgw.getAllTitles()
-
-        if config.nameFactorio in allWindows:
+        if self.factorioStatus == "server":
             log(f"INFO - factorio - {ctx.author} tried to start the Factorio server, but it was already running.")
             await ctx.send("Can't start the Factorio server, it is already running.")
         
@@ -191,10 +191,8 @@ class factorio(commands.Cog, name="Factorio Game Commands"):
 
     @commands.command(name="fstop", brief = "Stops Factorio server")
     async def factorioStop(self, ctx):
-        
-        allWindows = pgw.getAllTitles()
           
-        if config.nameFactorio in allWindows:
+        if self.factorioStatus == "server":
             log(f"INFO - factorio - {ctx.author} tried to stop the Factorio server")  
             await ctx.send("Stopping the Factorio server.")                      
             fctSrv = pgw.getWindowsWithTitle(config.nameFactorio)[0]
@@ -206,55 +204,48 @@ class factorio(commands.Cog, name="Factorio Game Commands"):
             pag.write('y')
             pag.press('enter')
             log("INFO - factorio - Factorio server stopped.")
-            
-            
 
         else:
             log(f"INFO - factorio - {ctx.author} tried to stop the Factorio server, but it was not running.")
             await ctx.send("Can't stop the Factorio server, it is not running.")  
+
+
+
+    def factorioStatus(self, ctx):
+        allWindows = pgw.getAllTitles()
+        if config.nameFactorio in allWindows:
+            return "server"
+        else:
+            return None 
+
 
 ####################################################################################################
 
 class servers(commands.Cog, name="Server Info"):
     def __init__(self, bot):
         self.bot = bot
-   
-
 
     @commands.command(name="servers", brief = "Shows server info")
     async def server(self, ctx):
-        
+        count = 0
         await ctx.trigger_typing()
         log(f"INFO - servers - {ctx.author} checked server status")
-        
+
         allWindows = pgw.getAllTitles()
-        response=""
 
-        #squad running
-        if config.nameSquad in allWindows:
-            response = response + "Squad: Running\n"
+        listOfCogs = bot.cogs
 
-        #squad updating
-        elif config.nameSquadUpdate in allWindows:
-            response = response + "Squad: Updating\n"
-
-        #squad not running
-        else:
-            response = response + "Squad: Not Running\n"
+        for nameOfCog, classOfCog in listOfCogs.items():
+            if nameOfCog == "Server Info":
+                continue
+            if nameOfCog in allWindows:
+                await ctx.send(f"{nameOfCog} server is running.")
+                count += 1
         
-
-        #factorio running
-        if config.nameFactorio in allWindows:
-            response = response + "Factorio: Running\n"
-
-        #factorio not running
-        else:
-            response = response + "Factorio: Not Running\n"    
-
-        
-        log(F"INFO - servers - {response}")
-        await ctx.send(response)
-
+        if count == 0:
+            await ctx.send("No game servers running.")
+                
+            
 ####################################################################################################
 
 def getSteamInfo(steam64ID=None):
